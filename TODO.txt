@@ -1,0 +1,80 @@
+// camera management
+- camera interpolation --> done
+
+// ------------------ physics ------------------
+- see init part, Gimpact algorithm, select suitable algorithm and broadphase
+
+- seriously, clamp velocities and angular velocities of bodies and use nice large forces for good response
+- use torque for rotation maybe, and clamp the roll and pitch part of the angular velocities  --> done
+- not abrupt halt in turning --> done
+
+- use the **m_userObjectPointer** in btCollisionObject to store client CsObject --> done
+- collision callback
+- terrain --> done
+
+- simulation tick callbacks to cap the velocities of bodies --> not needed
+- check default activation states for various bodies
+
+- try AxisSweep3 BroadPhase
+- CF_NEEDS_CONTACT_RESPONSE for sensor objects (in fact CF_NO_CONTACT_RESPONSE)
+- dummy->setCollisionFlags(dummy->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+  causes the simulation to skip rigid body dynamics powerups
+
+- CCD motion threshold (CUBE_HALF_EXTENTS)
+
+- use raycasts for bullets --> used convexcast instead.
+- also set collision flags and masks for the rayresultcallbacks
+
+- see testCCdphysicsdemo: NotMeRayResultCallback for shooting bullets
+
+- damping linear and angular, donot need to call applyDamping();
+- damping in the range 0 to 1
+
+- clearForces() to clear forces and torques
+- applyForce(Central) to apply force (called each frame)
+
+
+// ------------------ engine ------------------
+- LogicToRender message queue: to avoid excessive locking, first write to a temporary queue, and later synchronize the whole temp queue at once
+- similar implementationn for input synchronization between render and physics
+
+
+//--------------- scene ------------------
+- terrain
+- the treeloader really sucks!! fix it!!
+(trees removed)
+
+//------------- special effects ---------------
+- billboard sets with individual culling
+- _updatebounds() maybe setbounds() on billboard sets to remove weird behavoir
+- setting direction of oriented billboards
+
+- mParentSet member of Billboards  could be used during billboard removal and destruction
+
+
+- ribbon trails for tracking smoking objects (nodes), maybe one for rockets, other for burning ships
+
+
+
+//------------------------------- extra notes -----------------------------
+- gravity can be set different for different bodies
+- collision filter group and mask are part of the broadphase handle, not the body itself
+  (m_collisionFlags IS a part of the body and used for static/kinematic/etc/needs response etc)
+
+
+//----------------------- entire project-------------------------
+- start enums from 1
+- modify input manager to ignore small axis values (assume small values = 0)
+- check comments //, /*...........*/ and ///
+- PCH for CsBulletWorldImporter and CsDiscreteDynamicsWorld
+
+- recode the node removal part of managers, use temp list to store the nodes to be removed while iterating and remove them later all at once;
+- check if some manager is not cleaning up the motion state it created
+
+- reading entity data using MemoryDataStreamPtr and configfile or something similar
+HP=100
+Objective=Destroy
+ObjectiveDescription=Destroy the base of ktulu
+etc
+
+- path to LoadPhysicsData for terrain manager!!
